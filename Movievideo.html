@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watch Anime</title>
+    <style>
+        body {
+            text-align: center;
+            background-color: #181818;
+            color: white;
+        }
+        iframe {
+            width: 80%;
+            height: 500px;
+            border: none;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Now Watching</h1>
+    <iframe id="videoFrame" allowfullscreen></iframe>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const videoUrl = urlParams.get('video');
+        if (videoUrl) {
+            document.getElementById('videoFrame').src = videoUrl;
+        } else {
+            document.body.innerHTML = "<h2>Video not found</h2>";
+        }
+    </script>
+</body>
+</html>

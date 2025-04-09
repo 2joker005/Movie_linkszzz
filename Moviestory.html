@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Anime Stories</title>
+  <h1 style="color:Cyan;text-align:center">Movie Updates</h1>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #181818;
+      color: white;
+      overflow: hidden;
+    }
+    .stories-container {
+      display: flex;
+      gap: 10px;
+      padding: 10px;
+      overflow-x: auto;
+      white-space: nowrap;
+      scroll-behavior: smooth;
+    }
+    .story {
+      width: 80px;
+      height: 80px;
+      min-width: 80px;
+      border-radius: 50%;
+      overflow: hidden;
+      cursor: pointer;
+      border: 2px solid #fff;
+      transition: transform 0.3s ease-in-out;
+    }
+    .story:hover {
+      transform: scale(1.1);
+    }
+    .story img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .story-viewer {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+    }
+    .story-viewer.active {
+      opacity: 1;
+      display: flex;
+    }
+    .story-viewer video,
+    .story-viewer img {
+      max-width: 90%;
+      max-height: 80%;
+    }
+    .progress-bar {
+      width: 90%;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.3);
+      position: absolute;
+      top: 10px;
+    }
+    .progress {
+      height: 100%;
+      width: 0%;
+      background: white;
+      transition: width linear;
+    }
+    .mute-btn {
+      position: absolute;
+      bottom: 20px;
+      background: #fff;
+      color: #000;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: red;
+      color: white;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+    }
+    .nav-btn {
+      background: #333;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 10px;
+    }
+    .nav-btn:hover {
+      background: #555;
+    }
+    #storyCaption {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="stories-container" id="storiesContainer"></div>
+  <div class="story-viewer" id="storyViewer">
+    <div class="progress-bar"><div class="progress" id="progress"></div></div>
+    <video id="storyVideo" autoplay></video>
+    <img id="storyImage" style="display:none;" />
+    <div style="position: absolute; bottom: 70px; display: flex; gap: 20px;">
+      <button class="nav-btn" onclick="prevStory()">← Prev</button>
+      <button class="nav-btn" onclick="nextStory()">Next →</button>
+    </div>
+    <div id="storyCaption"></div>
+    <button class="mute-btn" id="muteBtn" onclick="toggleMute()">🔇</button>
+    <button class="close-btn" onclick="closeStory()">X</button>
+  </div>
+
+  <script>
+    let stories = [
+      { image: "Dragon.jpg", preview: "Dragon.jpg", caption: "Epic Battle Begins" },
+      { image: "Mur.jpg", preview: "Mur.jpg", caption: "Solo Leveling Power Rise" },
+      { image: "Ter.jpg", preview: "Ter.jpg", caption: "One Punch Moment!" },
+      { image: "God.jpeg", preview: "God.jpeg", caption: "God of Highschool Fights" },
+      { image: "Log.jpeg", preview: "Log.jpeg", caption: "Into the Log Horizon" },
+      { image: "Sword.jpeg", preview: "video1.mp4", caption: "Sword Art Online Dive" },
+      { image: "Tower.jpeg", preview: "Sword.jpeg", caption: "Tower of God Awakens" }
+    ];
+
+    let currentStory = 0;
+    let video = document.getElementById('storyVideo');
+    let image = document.getElementById('storyImage');
+    let viewer = document.getElementById('storyViewer');
+    let progress = document.getElementById('progress');
+    let muteBtn = document.getElementById('muteBtn');
+    let caption = document.getElementById('storyCaption');
+    let progressTimer = null;
+
+    function loadStories() {
+      let container = document.getElementById("storiesContainer");
+      stories.forEach((story, index) => {
+        let storyElement = document.createElement("div");
+        storyElement.classList.add("story");
+        storyElement.innerHTML = `<img src="${story.image}" alt="Story ${index + 1}">`;
+        storyElement.onclick = () => playStory(index);
+        container.appendChild(storyElement);
+      });
+    }
+
+    function playStory(index) {
+      currentStory = index;
+      let { preview, caption: capText } = stories[index];
+      viewer.classList.add('active');
+      caption.textContent = capText;
+      clearInterval(progressTimer);
+      progress.style.width = "0%";
+
+      if (/\.(mp4|webm|ogg)$/i.test(preview)) {
+        video.src = preview;
+        video.style.display = 'block';
+        image.style.display = 'none';
+        muteBtn.style.display = 'block';
+        video.play();
+        updateProgress(video.duration || 10, true);
+      } else {
+        image.src = preview;
+        image.style.display = 'block';
+        video.style.display = 'none';
+        muteBtn.style.display = 'none';
+        updateProgress(5, false); // show image for 5s
+      }
+    }
+
+    function closeStory() {
+      viewer.classList.remove('active');
+      video.pause();
+      video.currentTime = 0;
+      image.style.display = 'none';
+      caption.textContent = '';
+      clearInterval(progressTimer);
+      progress.style.width = "0%";
+    }
+
+    function toggleMute() {
+      video.muted = !video.muted;
+      muteBtn.textContent = video.muted ? "🔊" : "🔇";
+    }
+
+    function updateProgress(duration, isVideo) {
+      let start = Date.now();
+      progressTimer = setInterval(() => {
+        let elapsed = (Date.now() - start) / 1000;
+        let percent = (elapsed / duration) * 100;
+        progress.style.width = percent + "%";
+        if (elapsed >= duration) {
+          clearInterval(progressTimer);
+          if (isVideo) video.pause();
+          nextStory();
+        }
+      }, 100);
+    }
+
+    function nextStory() {
+      if (currentStory < stories.length - 1) {
+        playStory(currentStory + 1);
+      } else {
+        closeStory();
+      }
+    }
+
+    function prevStory() {
+      if (currentStory > 0) {
+        playStory(currentStory - 1);
+      }
+    }
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeStory();
+      if (event.key === "ArrowRight") nextStory();
+      if (event.key === "ArrowLeft") prevStory();
+    });
+
+    document.addEventListener("DOMContentLoaded", loadStories);
+  </script>
+   </body>
+</html>

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Movie_linkszzz</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #181818;
+      color: white;
+      text-align: center;
+      margin: 0;
+      transition: background 0.3s, color 0.3s;
+    }
+    .light-mode {
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    .light-mode .anime-card {
+      background-color: #ddd;
+    }
+    .light-mode .theme-toggle {
+      background-color: #ccc;
+      color: black;
+    }
+    .search-box, .filter-box {
+      margin: 10px;
+    }
+    input, select, button {
+      padding: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px;
+    }
+    .anime-card {
+      background-color: #252525;
+      padding: 10px;
+      border-radius: 10px;
+      width: 200px;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.3s;
+    }
+    .anime-card:hover {
+      transform: scale(1.05);
+    }
+    .anime-card img {
+      width: 100%;
+      border-radius: 10px;
+    }
+    .favorite-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: red;
+      border: none;
+      color: white;
+      padding: 5px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    .related-anime span {
+      color: green;
+      cursor: pointer;
+    }
+    .header {
+      padding: 20px;
+      background-color: #222;
+      border-bottom: 2px solid #444;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+    }
+    .logo {
+      height: 50px;
+      width: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 15px;
+    }
+    .theme-toggle {
+      background-color: #444;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .theme-toggle:hover {
+      background-color: #666;
+    }
+    iframe {
+      display: block;
+      margin: 0 auto;
+      padding: 0;
+      border: none;
+    }
+    .anime-cards-container {
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+    .stories-container {
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      padding: 20px;
+      flex-wrap: wrap;
+    }
+    .pagination button {
+      background: #333;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+    }
+    .pagination button.active {
+      background: green;
+    }
+    footer {
+      text-align: center;
+      margin-top: 50px;
+      color: #aaa;
+      font-size: 14px;
+    }
+    footer a {
+      color: #fff;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <img src="Logo.jpg" alt="@Movie_linkszzz" class="logo" />
+    <p><span style="font-weight: bold; color: cyan;">Movie_linkszzz</span></p>
+    <button id="themeButton" class="theme-toggle" onclick="toggleTheme()">🌙</button>
+  </div>
+  <iframe src="Moviestory.html" width="100%" height="200px"></iframe>
+  <div class="button"><a href="Moviestory.html"><h5 style="color:green;">To see Fullscreen Story</h5></a></div><br>
+  <div class="search-box">
+    <input type="text" id="search" placeholder="Search for an anime...">
+  </div>
+  <div class="filter-box">
+    <select id="genreFilter">
+      <option value="All">All Genres</option>
+      <option value="Action">Action</option>
+      <option value="Fantasy">Fantasy</option>
+      <option value="Adventure">Adventure</option>
+      <option value="Comedy">Comedy</option>
+      <option value="Horror">Horror</option>
+      <option value="Brutal">Brutal</option>
+    </select>
+  </div>
+  <div class="container" id="animeList"></div>
+  <div class="pagination" id="pagination"></div>
+  <script>
+    let animeData = [
+      {title: 'Dragon', img: 'Dragon.jpg', video: 'https://latest.tamilupdates.workers.dev/watch/67f3fae169b4448691d66cfc', genre: ['Action', 'Fantasy'], rating: '⭐️⭐️⭐️⭐️', related: ['Sword Art Online', 'Log Horizon']},
+      {title: 'Mur Mur', img: 'Mur.jpg', video: 'solo-ep1.mp4', genre: ['Horror'], rating: '⭐️⭐️⭐️⭐️⭐️', related: ['Tower of God', 'The God of High School']},
+      {title: 'Terrifier', img:'Ter.jpg', video: 'One-ep1.mp4', genre: ['Horror'], rating:'⭐️⭐️⭐️⭐️⭐️', related: ['Tower of God','Sword Art Online']},
+      {title: 'Marco', img:'Marco.jpg', video: 'https://latest.tamilupdates.workers.dev/watch/67f4a62ee92493dfe8b3853d', genre: ['Horror','Brutal'], rating:'⭐️⭐️⭐️⭐️⭐️', related: ['Terrifier','Sword Art Online']},
+      {title: 'Sword Art Online', img:'Sword.jpeg', video: 'Sword-ep1.mp4', genre: ['Adventure'], rating:'⭐️⭐️⭐️⭐️⭐️', related: ['Shangri La Frontier']},
+      {title: 'Log Horizon', img:'Log.jpeg', video: 'Log-ep1.mp4', genre: ['Fantasy'], rating:'⭐️⭐️⭐️⭐️⭐️', related: ['Solo Leveling']},
+      {title: 'The God of High School', img:'God.jpeg', video: 'God-ep1.mp4', genre: ['Comedy'], rating:'⭐️⭐️⭐️⭐️⭐️', related: ['Solo Leveling']},
+    ];
+  let currentPage = 1;
+  let itemsPerPage = 6;
+  let filteredData = animeData;
+
+function displayAnime(data, page) {
+  let container = document.getElementById('animeList');
+  container.innerHTML = '';
+  let start = (page - 1) * itemsPerPage;
+  let end = start + itemsPerPage;
+  let pageData = data.slice(start, end);
+  pageData.forEach(anime => {
+    let card = document.createElement('div');
+    card.className = 'anime-card';
+    let relatedLinks = anime.related.map(name => `<span onclick='filterByTitle("${name}")'>${name}</span>`).join(', ');
+    card.innerHTML = `
+      <img src="${anime.img}" alt="${anime.title}" />
+      <h3>${anime.title}</h3>
+      <p class='rating'>${anime.rating}</p>
+      <p class='genres'><strong>Genres:</strong> ${anime.genre.join(', ')}</p>
+      <p class='related-anime'><strong>Related:</strong> ${relatedLinks}</p>
+      <button class='favorite-btn' onclick='event.stopPropagation(); addToFavorites("${anime.title}")'>❤️</button>
+    `;
+    card.onclick = () => window.open(`Movievideo.html?video=${encodeURIComponent(anime.video)}`, "_blank");
+    container.appendChild(card);
+  });
+}
+
+function updatePagination(data, page) {
+  let pagination = document.getElementById('pagination');
+  pagination.innerHTML = '';
+  let totalPages = Math.ceil(data.length / itemsPerPage);
+
+  const maxVisiblePages = 5; // Change this to control how many page buttons to show
+  let startPage = Math.max(1, page - Math.floor(maxVisiblePages / 2));
+  let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+  if (endPage - startPage < maxVisiblePages - 1) {
+    startPage = Math.max(1, endPage - maxVisiblePages + 1);
+  }
+
+  if (page > 1) {
+    let prevBtn = document.createElement('button');
+    prevBtn.textContent = 'Prev';
+    prevBtn.onclick = () => changePage(page - 1);
+    pagination.appendChild(prevBtn);
+  }
+
+  if (startPage > 1) {
+    let firstBtn = document.createElement('button');
+    firstBtn.textContent = '1';
+    firstBtn.onclick = () => changePage(1);
+    pagination.appendChild(firstBtn);
+    if (startPage > 2) {
+      let dots = document.createElement('span');
+      dots.textContent = '...';
+      pagination.appendChild(dots);
+    }
+  }
+
+  for (let i = startPage; i <= endPage; i++) {
+    let btn = document.createElement('button');
+    btn.textContent = i;
+    if (i === page) btn.classList.add('active');
+    btn.onclick = () => changePage(i);
+    pagination.appendChild(btn);
+  }
+
+  if (endPage < totalPages) {
+    if (endPage < totalPages - 1) {
+      let dots = document.createElement('span');
+      dots.textContent = '...';
+      pagination.appendChild(dots);
+    }
+    let lastBtn = document.createElement('button');
+    lastBtn.textContent = totalPages;
+    lastBtn.onclick = () => changePage(totalPages);
+    pagination.appendChild(lastBtn);
+  }
+
+  if (page < totalPages) {
+    let nextBtn = document.createElement('button');
+    nextBtn.textContent = 'Next';
+    nextBtn.onclick = () => changePage(page + 1);
+    pagination.appendChild(nextBtn);
+  }
+}
+
+
+function changePage(page) {
+  currentPage = page;
+  displayAnime(filteredData, page);
+  updatePagination(filteredData, page);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function searchAnime() {
+  let query = document.getElementById('search').value.toLowerCase();
+  filteredData = animeData.filter(anime => anime.title.toLowerCase().includes(query));
+  changePage(1);
+}
+
+function filterByGenre() {
+  let genre = document.getElementById('genreFilter').value;
+  filteredData = genre === 'All'
+    ? animeData
+    : animeData.filter(anime => anime.genre.includes(genre));
+  changePage(1);
+}
+
+function filterByTitle(title) {
+  filteredData = animeData.filter(anime => anime.related.includes(title) || anime.title === title);
+  changePage(1);
+}
+
+function addToFavorites(title) {
+  let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+  if (!favorites.includes(title)) {
+    favorites.push(title);
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+    alert(`${title} added to favorites!`);
+  } else {
+    alert(`${title} is already in favorites.`);
+  }
+}
+
+function toggleTheme() {
+  let body = document.body;
+  let themeButton = document.getElementById('themeButton');
+  body.classList.toggle('light-mode');
+  localStorage.setItem('theme', body.classList.contains('light-mode') ? 'light' : 'dark');
+  themeButton.textContent = body.classList.contains('light-mode') ? '🌞' : '🌙';
+}
+
+function applySavedTheme() {
+  let savedTheme = localStorage.getItem('theme');
+  let themeButton = document.getElementById('themeButton');
+  if (savedTheme === 'light') {
+    document.body.classList.add('light-mode');
+    themeButton.textContent = '🌞';
+  }
+}
+
+window.onload = function() {
+  applySavedTheme();
+  changePage(1);
+  document.getElementById('search').addEventListener('input', searchAnime);
+  document.getElementById('genreFilter').addEventListener('change', filterByGenre);
+};
+
+  </script>
+  <footer>
+    <p>Copyright © of Movie_linkszzz</p>
+    <p><a href="#">↑ Back to top</a></p>
+  </footer>
+</body>
+</html>
